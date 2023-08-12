@@ -1,0 +1,13 @@
+.movie {
+  box-shadow: 0 0px 12px rgba(0, 0, 0, 0.5);
+  width: 450px;
+  min-height: 280px;
+  max-height: 280px;
+  margin: 15px;
+}
+.description__date,
+.description__genre,
+.description__text {
+  display: block;
+  padding: 5px;
+}
