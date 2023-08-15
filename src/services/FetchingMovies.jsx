@@ -13,10 +13,9 @@ export default class FetchingMovies {
       this.options
     )
     if (!result.ok) {
-      throw new Error(`Fetched failed, recieved ${result.status}`)
+      throw new Error(`Fetching failed, recieved ${result.status}`)
     }
     result = await result.json()
-    console.log(result.results)
     return result.results
   }
 }

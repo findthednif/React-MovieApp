@@ -1,9 +1,52 @@
 import React from 'react'
-import Movie from '../movie/Movie.jsx'
+import { Spin } from 'antd'
+import { format } from 'date-fns'
+
+import { ErrorMessage } from '../Messages/Messages'
+import Movie from '../movie/Movie'
+import FetchingMovies from '../../services/FetchingMovies'
 import './MovieList.css'
 export default class MovieList extends React.Component {
-  movies = () => {
-    const { moviesData } = this.props
+  state = {
+    loading: true,
+    genre: 'Action',
+    error: false,
+  }
+  componentDidMount() {
+    try {
+      this.gettingMoviesData()
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  onError = () => {
+    this.setState({
+      error: true,
+      loading: false,
+    })
+  }
+  gettingMoviesData = () => {
+    const movies = new FetchingMovies()
+    //setTimeout установлен, чтобы явно было видно, что индикатор загрузки присутствует
+    setTimeout(() => {
+      movies
+        .getMoviesData('Avengers')
+        .then((moviesData) => {
+          this.setState({
+            moviesData,
+            loading: false,
+          })
+        })
+        .catch(error =>{
+          console.log(error);
+          this.onError()})
+    }, 2000)
+  }
+  loadingMovies = () => {
+    return <Spin className="loadingSpinner" size="large" />
+  }
+  readyMoviesData = () => {
+    const { moviesData } = this.state
     return moviesData.map((movie) => {
       let { overview, original_title } = movie
       if (overview.length >= 200) {
@@ -17,10 +60,19 @@ export default class MovieList extends React.Component {
           titleLevel={titleLevel}
           date={movie.release_date}
           description={overview}
-          imgUrl={movie.poster_path}
+          ImgUrl={movie.poster_path}
+          genre={this.state.genre}
+          movieCreateTime={this.movieCreateTime}
         />
       )
     })
+  }
+  movieCreateTime = (release) => {
+    if (release) {
+      const date = new Date(release)
+      return format(date, 'MMMM dd, yyyy')
+    }
+    return 'NO DATA'
   }
   descriptionSlice = (description) => {
     let truncatedOverview = description.slice(0, 150)
@@ -33,6 +85,10 @@ export default class MovieList extends React.Component {
     return description
   }
   render() {
-    return <ul className="movies">{this.movies()}</ul>
+    const { loading, error } = this.state
+    if (error) {
+      return ErrorMessage()
+    }
+    return loading ? this.loadingMovies() : this.readyMoviesData()
   }
 }

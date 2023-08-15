@@ -1,23 +1,31 @@
-import React from 'react'
-import MovieList from '../MovieList/MovieList'
-import FetchingMovies from '../../services/FetchingMovies'
+import React from "react";
+import { LostNetworkMessage } from "../Messages/Messages";
+import MovieList from "../MovieList/MovieList";
 export default class App extends React.Component {
-  fetchedMovies = new FetchingMovies()
-
   state = {
-    moviesData: [],
-  }
+    isOnline: navigator.isOnline,
+  };
   componentDidMount() {
-    this.gettingMovieDatas()
+    window.addEventListener("online", this.handleOnline);
+    window.addEventListener("offline", this.handleOnline);
   }
-  gettingMovieDatas = () => {
-    this.fetchedMovies.getMoviesData('Мстители').then((result) => {
-      this.setState({
-        moviesData: result,
-      })
-    })
+  componentWillUnmount() {
+    window.removeEventListener('online', this.handleOnline)
+    window.removeEventListener('offline', this.handleOnline)
   }
+  handleOnline = () => {
+    this.setState(({ isOnline }) => {
+      return {
+        isOnline: !isOnline,
+      };
+    });
+  };
   render() {
-    return <MovieList moviesData={this.state.moviesData} />
+    return (
+      <>
+        {this.state.isOnline && LostNetworkMessage()}
+        <MovieList />
+      </>
+    );
   }
 }
