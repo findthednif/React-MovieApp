@@ -1,19 +1,12 @@
 import { Alert, Space } from "antd";
 export const ErrorMessage = () => {
   return (
-    <Space
-      direction="vertical"
-      style={{
-        width: "100%",
-      }}
-    >
       <Alert
         message="Error"
         showIcon
         description={"Movie loading has failed. Please try again."}
         type="error"
       />
-    </Space>
   );
 };
 export const LostNetworkMessage = () => {
