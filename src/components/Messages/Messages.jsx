@@ -1,14 +1,7 @@
-import { Alert, Space } from "antd";
+import { Alert } from 'antd'
 export const ErrorMessage = () => {
-  return (
-      <Alert
-        message="Error"
-        showIcon
-        description={"Movie loading has failed. Please try again."}
-        type="error"
-      />
-  );
-};
+  return <Alert message="Error" showIcon description={'Movie loading has failed. Please try again.'} type="error" />
+}
 export const LostNetworkMessage = () => {
   return (
     <Alert
@@ -17,5 +10,5 @@ export const LostNetworkMessage = () => {
       type="warning"
       showIcon
     />
-  );
-};
+  )
+}

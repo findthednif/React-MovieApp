@@ -1,0 +1,25 @@
+.movieRating {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  width: 30px;
+  height: 30px;
+  border: 5px solid black;
+  border-radius: 50%;
+  padding: 10px;
+  text-align: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+.green {
+  border-color: #66e900;
+}
+.yellow {
+  border-color: #e9d100;
+}
+.orange {
+  border-color: #e97e00;
+}
+.red {
+  border-color: #e90000;
+}

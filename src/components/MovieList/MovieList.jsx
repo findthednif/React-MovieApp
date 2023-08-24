@@ -1,126 +1,143 @@
-import React from "react";
-import SearchPanel from "../SearchPanel/SearchPanel";
-import { Pagination, Spin, Typography } from "antd";
-import { format } from "date-fns";
-import { ErrorMessage } from "../Messages/Messages";
-import Movie from "../movie/Movie";
-import FetchingMovies from "../../services/FetchingMovies";
-import "./MovieList.css";
-const { Title } = Typography;
+import React from 'react'
+import { Pagination, Spin, List } from 'antd'
+
+import { ErrorMessage } from '../Messages/Messages'
+import Movie from '../movie/Movie'
+import MovieDB from '../../services/MovieDB'
+import './MovieList.css'
 export default class MovieList extends React.Component {
+  movieDB = new MovieDB()
   state = {
     totalPages: null,
     currentPage: 1,
     moviesData: [],
     loading: false,
-    genre: "Action",
+    genre: 'Action',
     error: false,
-  };
+  }
   componentDidUpdate(prevProps) {
-    if (prevProps.query !== this.props.query) {
+    if (prevProps.query !== this.props.query || prevProps.ratedOnly !== this.props.ratedOnly) {
       this.setState({
         loading: true,
-      });
-      const { query } = this.props
-      const { currentPage } = this.state;
-      this.gettingMoviesData(query, currentPage);
+      })
+      const { query, ratedOnly, guestSessionId } = this.props
+      const { currentPage } = this.state
+      if (ratedOnly) {
+        this.getRatedMovies(guestSessionId)
+      } else {
+        this.gettingMoviesData(query, currentPage)
+      }
     }
   }
   gettingMoviesData = (query, page) => {
-    const movies = new FetchingMovies();
-    movies
+    this.movieDB
       .getMoviesData(query, page)
       .then((moviesData) => {
         this.setState({
           moviesData: moviesData.results,
           totalPages: moviesData.total_pages,
           loading: false,
-        });
+        })
       })
       .catch((error) => {
-        console.error(error);
-        this.gettingMoviesError();
-      });
-  };
+        console.error(error)
+        this.gettingMoviesError()
+      })
+  }
+  getRatedMovies = (id) => {
+    this.movieDB.getRatedMovies(id).then((ratedMovies) => {
+      this.setState({
+        moviesData: ratedMovies.results,
+        totalPages: ratedMovies.total_pages,
+        loading: false,
+      })
+    })
+  }
   gettingMoviesError = () => {
     this.setState({
       error: true,
       loading: false,
-    });
-  };
+    })
+  }
   pageChange = (page) => {
-    const { query } = this.props;
+    const { query, ratedOnly, guestSessionId } = this.props
     this.setState({
       currentPage: page,
       loading: true,
-    });
-    this.gettingMoviesData(query, page);
-  };
-  readyMovies = (moviesData) => {
-    return moviesData.map((movie) => {
-      let { overview, original_title } = movie;
+    })
+    if (ratedOnly) {
+      this.getRatedMovies(guestSessionId)
+    } else {
+      this.gettingMoviesData(query, page)
+    }
+  }
+  descriptionSlice = (description) => {
+    let truncatedOverview = description.slice(0, 150)
+    let lastSpaceIndex = truncatedOverview.lastIndexOf(' ')
+    if (lastSpaceIndex !== -1) {
+      description = truncatedOverview.slice(0, lastSpaceIndex) + '...'
+    } else {
+      description = truncatedOverview + '...'
+    }
+    return description
+  }
+  readyMoviesList = (moviesData) => {
+    const readyMovies = moviesData.map((movie) => {
+      let { overview } = movie
       if (overview.length >= 200) {
-        overview = this.descriptionSlice(overview);
+        overview = this.descriptionSlice(overview)
       }
-      const titleLevel = original_title.length > 25 ? 5 : 3;
       return (
         <Movie
           key={movie.id}
+          id={movie.id}
           title={movie.original_title}
-          titleLevel={titleLevel}
           date={movie.release_date}
           description={overview}
           ImgUrl={movie.poster_path}
-          genre={this.state.genre}
+          genresIds={movie.genre_ids}
+          rating={movie.vote_average}
           movieCreateTime={this.movieCreateTime}
+          guestSessionId={this.props.guestSessionId}
         />
-      );
-    });
-  };
-  movieCreateTime = (release) => {
-    if (release) {
-      const date = new Date(release);
-      return format(date, "MMMM dd, yyyy");
-    }
-    return "NO DATA";
-  };
-  descriptionSlice = (description) => {
-    let truncatedOverview = description.slice(0, 150);
-    let lastSpaceIndex = truncatedOverview.lastIndexOf(" ");
-    if (lastSpaceIndex !== -1) {
-      description = truncatedOverview.slice(0, lastSpaceIndex) + "...";
-    } else {
-      description = truncatedOverview + "...";
-    }
-    return description;
-  };
+      )
+    })
+    return (
+      <List
+        className="moviesList"
+        split={false}
+        size="small"
+        grid={{}}
+        locale={{ emptyText: 'No movies' }}
+        dataSource={readyMovies}
+        renderItem={(item) => {
+          return <List.Item>{item}</List.Item>
+        }}
+      />
+    )
+  }
   render() {
-    const { totalPages, moviesData, loading, error } = this.state;
+    const { moviesData, totalPages, loading, error } = this.state
     return (
       <>
         {error && ErrorMessage()}
-        {loading ? spinner() : this.readyMovies(moviesData)}
-        {moviesData.length > 0 && totalPages > 1 ? (
+        {loading ? spinner() : this.readyMoviesList(moviesData)}
+        {
           <Pagination
-            showSizeChanger = {false}
-            showQuickJumper = {true}
+            responsive
+            hideOnSinglePage={true}
+            className="moviesList__pagination"
+            showSizeChanger={false}
+            showQuickJumper={true}
             defaultCurrent={1}
             total={totalPages * 10}
             onChange={this.pageChange}
           />
-        ) : (
-          !loading &&
-          !error &&
-          moviesData.length === 0 && (
-            <Title level={3} italic={true}>
-              No movies available
-            </Title>
-          )
-        )}
+        }
       </>
-    );
+    )
   }
 }
 const spinner = () => {
-  return <Spin className="loadingSpinner" size="large" />;
-};
+  return <Spin className="loadingSpinner" size="large" />
+}

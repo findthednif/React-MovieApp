@@ -1,13 +1,25 @@
 .movie {
+  position: relative;
   box-shadow: 0 0px 12px rgba(0, 0, 0, 0.5);
-  width: 450px;
-  min-height: 280px;
-  max-height: 280px;
-  margin: 15px;
+  width: 510px;
+  height: 280px;
 }
 .description__date,
-.description__genre,
-.description__text {
-  display: block;
-  padding: 5px;
+.description__text,
+.description__title {
+  margin: 0;
+}
+.description__genre {
+  display: flex;
+  flex-wrap: wrap;
+}
+.movie__description {
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+.description__rate {
+  margin-top: auto;
+  margin-bottom: 5px;
 }
