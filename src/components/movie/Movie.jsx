@@ -41,7 +41,11 @@ export default class Movie extends React.Component {
   }
   addRating = (rating) => {
     const { id, guestSessionId } = this.props
-    this.movieDB.addRating(id, guestSessionId, rating)
+    if (rating !== 0) {
+      this.movieDB.addRating(id, guestSessionId, rating)
+    } else {
+      this.movieDB.deleteRating(id, guestSessionId)
+    }
     this.setState({
       rate: rating,
     })
@@ -59,9 +63,12 @@ export default class Movie extends React.Component {
           height={280}
         />
         <div className="movie__description">
-          <Title className="description__title" level={5}>
-            {title}
-          </Title>
+          <div className="description__title">
+            <Title className="title__name" level={5}>
+              {title}
+            </Title>
+            <MovieRating rating={rating} />
+          </div>
           <Text className="description__date" type="secondary">
             {this.movieCreateTime(date)}
           </Text>
@@ -71,7 +78,6 @@ export default class Movie extends React.Component {
           <Text className="description__text">{description}</Text>
           <Rate className="description__rate" count={10} allowClear={true} onChange={this.addRating} value={rate} />
         </div>
-        <MovieRating rating={rating} />
       </Space>
     )
   }

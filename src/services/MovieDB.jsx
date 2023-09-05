@@ -17,7 +17,6 @@ export default class FetchingMovies {
       throw new Error(`getMoviesData failed, recieved ${result.status}`)
     }
     result = await result.json()
-    console.log(result)
     return result
   }
   createGuestSession = async () => {
@@ -45,6 +44,20 @@ export default class FetchingMovies {
     result = await result.json()
     return result
   }
+  deleteRating = async (movieId, sessionId) => {
+    let result = await fetch(`${this.url}/movie/${movieId}/rating?${this.apiKey}&guest_session_id=${sessionId}`, {
+      method: 'DELETE',
+      headers: {
+        accept: 'application/json',
+        'Content-Type': 'application/json;charset=utf-8',
+      },
+    })
+    if (!result.ok) {
+      throw new Error(`deleteRating failed, recieved ${result.status}`)
+    }
+    result = await result.json()
+    return result
+  }
   getRatedMovies = async (id) => {
     let result = await fetch(
       `${this.url}/guest_session/${id}/rated/movies?${this.apiKey}&language=en-US&page=1&sort_by=created_at.asc`
@@ -66,7 +79,6 @@ export default class FetchingMovies {
       throw new Error(`getGenres failes, recieved ${result.status}`)
     }
     result = await result.json()
-    console.log(result.genres)
     return result.genres
   }
 }

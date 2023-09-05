@@ -1,8 +1,5 @@
 .movieRating {
-  position: absolute;
-  right: 10px;
-  top: 10px;
-  width: 30px;
+  min-width: 30px;
   height: 30px;
   border: 5px solid black;
   border-radius: 50%;

@@ -9,7 +9,6 @@ export default class Genres extends React.Component {
     return (
       <Consumer>
         {(genres) => {
-          console.log(genres)
           return genres.map((el) => {
             let genre
             if (genresIds.includes(el.id)) {

@@ -1,13 +1,18 @@
 .movie {
-  position: relative;
   box-shadow: 0 0px 12px rgba(0, 0, 0, 0.5);
   width: 510px;
   height: 280px;
 }
 .description__date,
 .description__text,
-.description__title {
+.title__name {
   margin: 0;
+}
+.description__title {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  padding: 5px 5px 0 0;
 }
 .description__genre {
   display: flex;
